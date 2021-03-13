@@ -3,12 +3,14 @@ import React from 'react';
 import './card.styles.css';
 
 export const Card = props => (
-  <div className='card-container'>
-    <img
-      alt='monster'
-      src={`https://robohash.org/${props.monster.id}?set=set2&size=180x180`}
-    />
-    <h2> {props.monster.name} </h2>
-
+  <div className='col-md-4 mt-4'>
+    <div className="card-container">
+      <iframe
+        className="img-fluid"
+        alt='Gifs'
+        src={props.gif.embed_url}
+      />
+      <h2> {props.gif.title} </h2>
+    </div>
   </div>
 );

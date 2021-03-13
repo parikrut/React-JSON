@@ -1,46 +1,49 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { CardList } from './components/card-list/card-list.component';
 import { SearchBox } from './components/search-box/search-box.component';
+import { GiphyFetch } from "@giphy/js-fetch-api";
 
 import './App.css';
 
-class App extends Component {
-  constructor() {
-    super();
+const giphyFetch = new GiphyFetch(process.env.REACT_APP_GIPHY_API);
 
-    this.state = {
-      monsters: [],
-      searchField: ''
-    };
+const App = () =>{
+  const [gif, setGif] = useState([]) 
+  const [searchField, setSearchField] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const getAPI = async() => {
+      const response = await giphyFetch.trending()
+      console.log(response.data)
+      setGif(response.data)
+      setLoading(false)
+    }
+    getAPI()
+  }, [])
+
+  // i would have include a beautifull loading component here in production env
+  if(loading){
+    return(
+      <div>Loading</div>
+    )
   }
 
-  componentDidMount() {
-    fetch('https://the-one-api.dev/v2/book')
-      .then(response => response.json())
-      .then(users => this.setState({ monsters: users.docs }));
+  const onSearchChange = event => {
+    setSearchField(event.target.value)
   }
 
-  onSearchChange = event => {
-    this.setState({ searchField: event.target.value });
-  };
+  return(
+    
+    <div className='App'>
+    <h1>Giphy Integration with search</h1>
 
-  render() {
-    const { monsters, searchField } = this.state;
-    const filteredMonsters = monsters.filter(monster =>
-      monster.name.toLowerCase().includes(searchField.toLowerCase())
-    );
-
-    return (
-      <div className='App'>
-        {console.log(monsters)}
-        <h1>Book Api With Search</h1>
-
-        <SearchBox onSearchChange={this.onSearchChange} />
-        <CardList monsters={filteredMonsters} />
-      </div>
-    );
-  }
+    <SearchBox onSearchChange={onSearchChange} />
+    <CardList gif={gif.filter(gif =>
+        gif.title.toLowerCase().includes(searchField.toLowerCase()))} />
+  </div>
+  )
 }
 
 export default App;
